@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>像素鸟无限循环</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #game {
+            width: 800px;
+            height: 500px;
+            background: url('./images/sky.png');
+            position: relative;
+            overflow: hidden;
+        }
+
+        #bird {
+            width: 34px;
+            height: 25px;
+            background: url('./images/birds.png') -8px -10px no-repeat;
+            position: absolute;
+            top: 100px;
+            left: 120px;
+        }
+        .time {
+            width: 20px;
+            height: 20px;
+            font-size: 20px;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game">
+        <div id="bird"></div>
+    </div>
+    <div class="time">0</div>
+</body>
+</html>
+<script>
+     //获取元素
+     var game = document.getElementById('game');
+     var smallBird = document.getElementById('bird');
+     var time = document.querySelector('.time');
+     
+     var sky = {
+         //初始位置x
+         x : 0
+
+
+     }
+     //初始化小鸟得值
+     var bird = {
+         speedX : 5,
+         speedY : 0,
+         x : smallBird.offsetLeft,
+         y : smallBird.offsetTop,
+         
+     }
+    //  定义游戏的状态
+      var running = true;
+     //定时器
+     setInterval(function(){
+          if(running === true){
+        //移动背景 让小鸟实现水平运动
+         game.style.backgroundPositionX = sky.x + 'px';
+         //图片移动的速度
+         sky.x += -5;
+        //实现小鸟得上下运动
+         //自增
+         //小鸟的高度
+         bird.speedY += 1;
+         bird.y += bird.speedY;
+         //假如触碰到上边界
+         if(bird.y < 0){
+            running = false;
+            bird.y = 0;
+            clearInterval(timeId)
+            alert('分数为' + (timeM - 1))
+         }
+         //假如碰到下边界
+         if(bird.y + smallBird.offsetHeight > 500){
+             running = false;
+             bird.y = 500 - smallBird.offsetHeight;
+             clearInterval(timeId)
+             alert('分数为' + (timeM - 1))
+         }
+         smallBird.style.top = bird.y + 'px';
+          }
+     },30)
+        //点击文档实现小鸟向上运动
+        document.onclick = function(){
+            //点击一下小鸟跳10像素
+             bird.speedY = -10;
+        } 
+        //实现回车和空格代替鼠标
+        document.onkeydown = function(e){
+            if(e.keyCode === 32 || e.keyCode === 13){
+                document.onclick();
+            }
+        }
+
+
+        //创建管道
+         function createPipe(position){
+            var pipe = {};
+            pipe.x = position;
+            //规定上管道的高度 50-250之间
+            pipe.upHeight = 50 + Math.floor(Math.random() * 250);
+            pipe.dwHeight = 500 - pipe.upHeight - 100;
+            pipe.dwTop = pipe.upHeight + 100;
+            //上管道
+            var upPipe = document.createElement('div');
+            upPipe.style.width = 52 + 'px';
+            upPipe.style.height = pipe.upHeight + 'px';
+            upPipe.style.background = 'url(./images/pipe2.png) no-repeat center bottom';
+            upPipe.style.position = 'absolute';
+            upPipe.style.top = 0;
+            upPipe.style.left = pipe.x + 'px';
+            game.appendChild(upPipe);
+            //下管道
+            var dwPipe = document.createElement('div');
+            dwPipe.style.width = 52 + 'px';
+            dwPipe.style.height = pipe.dwHeight + 'px';
+            dwPipe.style.background = 'url(./images/pipe1.png) no-repeat center top';
+            dwPipe.style.position = 'absolute';
+            dwPipe.style.top = pipe.dwTop + 'px';
+            dwPipe.style.left = pipe.x + 'px';
+            game.appendChild(dwPipe);
+
+
+           //让管道运动起来
+           setInterval(function(){
+               if(running === true){
+                 //管道的速度 
+                 pipe.x -= 4;
+                 upPipe.style.left = pipe.x + 'px';
+                 dwPipe.style.left = pipe.x + 'px';
+                 if(pipe.x < -52){
+                     //管道的出现位置
+                     pipe.x = 800;
+                 }
+                 var upCheck = bird.x + 34 > pipe.x && bird.x < pipe.x + 52 && bird.y < pipe.upHeight;
+                 var dwCheck = bird.x + 34 > pipe.x && bird.x < pipe.x + 52 && bird.y > pipe.upHeight + 75;
+                 if(upCheck || dwCheck ){
+                     running = false;
+                     clearInterval(timeId)
+                     alert('分数为' + (timeM - 1))
+                 }
+               }
+            
+           },30)
+
+
+
+
+         }
+         //管道的出现位置
+         createPipe(400)
+         createPipe(600)
+         createPipe(800)
+         createPipe(1000)
+         var timeM = 1;
+        var timeId = setInterval(function(){
+         time.innerText = timeM
+            timeM ++; 
+         },1300)
+
+ </script>
